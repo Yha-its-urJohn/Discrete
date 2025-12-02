@@ -17,26 +17,136 @@ try {
         });
     });
 
-    // All topics, digraph SVG and matrices, unchanged...
+    // Comprehensive topics about Representation and Closure of Relations
     const repTopics = [
-        // ... (rest of topics as before, including digraph topic showing rel_digraph.svg) ...
+        {
+            id: "def",
+            label: "Definition of Relations",
+            content: `
+<h2>Definition of Relations</h2>
+<p>A <b>relation</b> R from set A to B is a set of ordered pairs (a, b) where a ∈ A and b ∈ B. If A = B, it's a relation "on" A.</p>
+<pre>Example: If A = {1,2,3}, R = {(1,2), (2,3), (1,3)}</pre>
+`
+        },
+        {
+            id: "rep",
+            label: "Ways to Represent Relations",
+            content: `
+<h2>Ways to Represent Relations</h2>
+<ul>
+    <li>Set of Ordered Pairs: <code>{(1,2), (2,3), (3,1)}</code></li>
+    <li>Table/List</li>
+    <li>Directed Graph (Digraph) <br><img src="assets/images/rel_digraph.png" style="max-width:200px"></li>
+    <li>Zero-One Matrix <br><img src="assets/images/rel_matrix.png" style="max-width:200px"></li>
+    <li>Arrow Diagrams</li>
+</ul>
+`
+        },
+        {
+            id: "types",
+            label: "Types and Properties of Relations",
+            content: `
+<h2>Types and Properties of Relations</h2>
+<ul>
+    <li><b>Reflexive:</b> (a,a) for all a ∈ A</li>
+    <li><b>Irreflexive:</b> No (a,a) for any a</li>
+    <li><b>Symmetric:</b> If (a,b) ∈ R, then (b,a) ∈ R</li>
+    <li><b>Antisymmetric:</b> If (a,b), (b,a) ∈ R, then a = b</li>
+    <li><b>Transitive:</b> If (a,b), (b,c) ∈ R, then (a,c) ∈ R</li>
+    <li><b>Equivalence Relation:</b> Reflexive, Symmetric, and Transitive</li>
+    <li><b>Partial Order:</b> Reflexive, Antisymmetric, and Transitive</li>
+</ul>
+`
+        },
+        {
+            id: "matrix",
+            label: "Zero-One Matrix of Relations",
+            content: `
+<h2>Zero-One Matrix Representation</h2>
+<p>The matrix M of relation R on set A = {a<sub>1</sub>,...,a<sub>n</sub>} has M[i][j] = 1 if (a<sub>i</sub>, a<sub>j</sub>) ∈ R, else 0.</p>
+<pre>
+   1 2 3
+  -------
+1| 1 0 1
+2| 0 1 0
+3| 1 1 1
+</pre>
+`
+        },
         {
             id: "digraph",
             label: "Digraphs & Arrow Diagrams",
             content: `
 <h2>Digraphs & Arrow Diagrams</h2>
 <p>Relations can be visualized as directed graphs (digraphs), with elements as nodes and arrows for each pair (a,b) ∈ R.</p>
-<img src="assets/images/rel_digraph.svg" alt="Relation Digraph" style="max-width:250px; display:block; margin:18px auto 2px auto;">
-<small style="display:block; text-align:center; color:#cfeff8;">Example: Digraph for R = {(1,2), (2,3)}</small>
+<img src="assets/images/rel_digraph.png" style="max-width:250px">
+`
+        },
+        {
+            id: "closure",
+            label: "Closure of Relations",
+            content: `
+<h2>Closures of Relations</h2>
+<ul>
+    <li><b>Reflexive Closure:</b> Add (a,a) for all a ∈ A</li>
+    <li><b>Symmetric Closure:</b> Add (b,a) for all (a,b) ∈ R</li>
+    <li><b>Transitive Closure:</b> Add (a,c) whenever (a,b),(b,c) ∈ R</li>
+</ul>
+<pre>
+If R = {(1,2),(2,3)}, transitive closure R* = {(1,2),(2,3),(1,3)}
+</pre>
+`
+        },
+        {
+            id: "algorithms",
+            label: "Algorithms for Closures (Warshall’s)",
+            content: `
+<h2>Algorithms for Closures</h2>
+<p><b>Warshall’s Algorithm</b> quickly finds the transitive closure of a relation using its matrix.</p>
+<pre>
+Repeat for all k in {1..n}:
+  For all i, j:
+    Set M[i][j] = M[i][j] OR (M[i][k] AND M[k][j])
+</pre>
+`
+        },
+        {
+            id: "applications",
+            label: "Applications of Relations/Closures",
+            content: `
+<h2>Applications</h2>
+<ul>
+    <li>Database relationships</li>
+    <li>Social networks (friendship, links)</li>
+    <li>Accessibility, network connectivity</li>
+    <li>Partial orders in task planning</li>
+    <li>Equivalence relations in partitioning</li>
+    <li>State machines, automata</li>
+</ul>
+`
+        },
+        {
+            id: "practice",
+            label: "Practice Problems & Examples",
+            content: `
+<h2>Practice Problems & Examples</h2>
+<p>Given A = {1,2,3}, R = {(1,2),(2,3)}:</p>
+<ul>
+    <li>Find the matrix representation of R</li>
+    <li>Is R reflexive, symmetric, transitive?</li>
+    <li>Find the reflexive/symmetric/transitive closure</li>
+</ul>
+<p>Try: R = {(a,b),(b,c),(c,a)} on {a,b,c}</p>
 `
         }
-        // ... (other topics unchanged) ...
     ];
 
+    // Render the topic buttons and show their content inline, directly below the button
     function renderTopicButtons() {
         const topicsList = document.getElementById('topicsList');
         topicsList.innerHTML = '';
         repTopics.forEach(topic => {
+            // wrapper for button and inline content div
             const wrapper = document.createElement('div');
             wrapper.style.marginBottom = '8px';
 
@@ -65,6 +175,7 @@ try {
         });
     }
 
+    // Show page function (adjusted so topics uses renderTopicButtons inline)
     let currentCategory = 'input';
     function showPage(page) {
         document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
@@ -78,26 +189,8 @@ try {
         if (page === 'quiz') loadQuiz();
     }
 
-    // Integrated: Matrix Tool instruction definition box
+    // -- Matrix tool logic remains unchanged --
     function initMatrixTool() {
-        // Add definitions/instructions at the top
-        const desc = document.getElementById('toolDescription');
-        if (desc) {
-            desc.innerHTML = `
-<div class="tool-info-box">
-  <h3 style="margin-top:4px;">How to use the Matrix Tool</h3>
-  <ul>
-    <li>Enter your relation as ordered pairs in parentheses, separated by commas.<br>
-      <small>Example: <code>(1,2),(2,3),(2,1)</code></small></li>
-    <li>Click <b>Show Matrix</b> to view the zero-one matrix for your relation — showing which elements are related.</li>
-    <li>To start fresh, click <b>New Matrix</b>.</li>
-    <li>Switch categories (Input/Closure) using the sidebar — the Closure tab is for future updates.</li>
-    <li><b>Tip:</b> This tool is for learning how relations are represented as matrices in Discrete Math.</li>
-  </ul>
-</div>
-            `;
-        }
-
         const matrixList = document.getElementById('matrixList');
         const matrixBtn = document.getElementById('matrixBtn');
         const matrixInput = document.getElementById('matrixInput');
@@ -170,6 +263,7 @@ try {
         }
     }
 
+    // Quiz remains unchanged
     const quizQuestions = [
         { q: 'Which is a way to represent a relation?', opts: ['Set of pairs', 'Digraph', 'Matrix', 'All of the above'], a: 3 },
         { q: 'The reflexive closure of R on {1,2} adds which pair?', opts: ['(1,2)', '(2,1)', '(1,1) and (2,2)', 'None'], a: 2 },
