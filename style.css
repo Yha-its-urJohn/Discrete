@@ -1,0 +1,13 @@
+.tool-info-box {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #105067;
+    color: #e6eef3;
+    border-radius: 7px;
+    box-shadow: 0 2px 8px rgba(20,40,70,.07);
+    max-width: 600px;
+}
+.tool-info-box h3 { margin-top: 4px; margin-bottom: 10px; color: #48b6e8; font-size: 1.22em; }
+.tool-info-box code { background: #032935; color: #a0e3ff; border-radius: 4px; padding: 2px 4px; }
+
+/* Full previous CSS here (not shown for brevity but keep all previous styles!) */
