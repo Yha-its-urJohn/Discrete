@@ -17,8 +17,29 @@ try {
         });
     });
 
-    // -- Topics array: NO Definition, NO Practice Problems topic --
+    // -- Topics array: now with Definition at the top --
     const repTopics = [
+        {
+            id: "def",
+            label: "Definition of Relations",
+            content: `
+<h2>Definition of Relations</h2>
+<p>
+A relation <strong>R</strong> from a set <strong>A</strong> to a set <strong>B</strong> is a subset of the Cartesian product <strong>A × B</strong>.<br>
+If <strong>A = B</strong>, the relation is called a relation <strong>on A</strong>.
+</p>
+<h3>Example</h3>
+<p>
+Let A = {1, 2, 3}.<br>
+Define a relation R = {(1,2), (2,3)}.<br>
+This means:
+<ul>
+  <li>1 is related to 2</li>
+  <li>2 is related to 3</li>
+</ul>
+</p>
+`
+        },
         {
             id: "rep",
             label: "Ways to Represent Relations",
