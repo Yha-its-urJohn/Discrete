@@ -191,55 +191,129 @@ Repeat for all k in {1..n}:
             };
         }
 
-        if (matrixBtn && matrixInput) {
-            matrixBtn.onclick = () => {
-                const input = matrixInput.value;
-                const pairs = input.match(/\(([^)]+)\)/g);
-                if (!pairs || !pairs.length) {
-                    matrixList.innerHTML = '<p>Enter at least one pair like (1,2),(2,3)</p>';
-                    if (noMatrixMsg) noMatrixMsg.style.display = 'none';
-                    return;
-                }
-                let elements = new Set();
-                let relPairs = [];
-                pairs.forEach(pair => {
-                    let nums = pair.replace(/[()]/g, '').split(',');
-                    if (nums.length === 2) {
-                        elements.add(nums[0].trim());
-                        elements.add(nums[1].trim());
-                        relPairs.push(nums.map(x => x.trim()));
-                    }
+       // Inside function initMatrixTool (replace ONLY the matrixBtn.onclick handler with this):
+
+if (matrixBtn && matrixInput) {
+    matrixBtn.onclick = () => {
+        const input = matrixInput.value;
+        const pairs = input.match(/\(([^)]+)\)/g);
+        if (!pairs || !pairs.length) {
+            matrixList.innerHTML = '<p>Enter at least one pair like (1,2),(2,3)</p>';
+            if (noMatrixMsg) noMatrixMsg.style.display = 'none';
+            return;
+        }
+        let elements = new Set();
+        let relPairs = [];
+        pairs.forEach(pair => {
+            let nums = pair.replace(/[()]/g, '').split(',');
+            if (nums.length === 2) {
+                elements.add(nums[0].trim());
+                elements.add(nums[1].trim());
+                relPairs.push(nums.map(x => x.trim()));
+            }
+        });
+        elements = Array.from(elements).sort();
+        // Build Matrix
+        let matrix = {};
+        elements.forEach(row => {
+            matrix[row] = {};
+            elements.forEach(col => {
+                matrix[row][col] = relPairs.some(([r, c]) => r === row && c === col) ? 1 : 0;
+            });
+        });
+
+        // Analyze relation properties
+        const isReflexive = elements.every(e => matrix[e][e] === 1);
+        const isIrreflexive = elements.every(e => matrix[e][e] === 0);
+        const isSymmetric = elements.every(
+            r => elements.every(
+                c => matrix[r][c] === matrix[c][r]
+            )
+        );
+        const isAntisymmetric = elements.every(
+            a => elements.every(
+                b => (a === b) || (matrix[a][b] === 0 || matrix[b][a] === 0)
+            )
+        );
+        // Transitive: for all a,b,c if (a,b) and (b,c) then (a,c)
+        let isTransitive = true;
+        elements.forEach(a => {
+            elements.forEach(b => {
+                elements.forEach(c => {
+                    if (matrix[a][b] && matrix[b][c] && !matrix[a][c]) isTransitive = false;
                 });
-                elements = Array.from(elements).sort();
-                let html = '<table><tr><th></th>' + elements.map(e => `<th>${e}</th>`).join('') + '</tr>';
-                elements.forEach(row => {
-                    html += `<tr><td>${row}</td>`;
-                    elements.forEach(col => {
-                        let found = relPairs.some(([r, c]) => r === row && c === col);
-                        html += `<td>${found ? '1' : '0'}</td>`;
-                    });
-                    html += '</tr>';
-                });
-                html += '</table>';
-                matrixList.innerHTML = html;
-                if (noMatrixMsg) noMatrixMsg.style.display = 'none';
+            });
+        });
+
+        // Matrix Table HTML
+        let html = '<table><tr><th></th>' + elements.map(e => `<th>${e}</th>`).join('') + '</tr>';
+        elements.forEach(row => {
+            html += `<tr><td>${row}</td>`;
+            elements.forEach(col => {
+                html += `<td>${matrix[row][col]}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</table>';
+
+        // Properties Analysis HTML
+        html += `<div style="margin-top:18px;padding:10px;background:#192c44;border-radius:8px">
+            <strong>Analysis:</strong>
+            <ul>
+                <li>Reflexive: <b style="color:${isReflexive?'#3ae373':'#f37575'}">${isReflexive?'Yes':'No'}</b></li>
+                <li>Irreflexive: <b style="color:${isIrreflexive?'#3ae373':'#f37575'}">${isIrreflexive?'Yes':'No'}</b></li>
+                <li>Symmetric: <b style="color:${isSymmetric?'#3ae373':'#f37575'}">${isSymmetric?'Yes':'No'}</b></li>
+                <li>Antisymmetric: <b style="color:${isAntisymmetric?'#3ae373':'#f37575'}">${isAntisymmetric?'Yes':'No'}</b></li>
+                <li>Transitive: <b style="color:${isTransitive?'#3ae373':'#f37575'}">${isTransitive?'Yes':'No'}</b></li>
+            </ul>
+        </div>`;
+
+        // D I G R A P H - in SVG
+        // Create positions for each node in a circle
+        const RADIUS = 90, CX = 120, CY = 120;
+        const nodePos = {};
+        elements.forEach((el, i) => {
+            let angle = 2 * Math.PI * i / elements.length;
+            nodePos[el] = {
+                x: CX + RADIUS * Math.cos(angle),
+                y: CY + RADIUS * Math.sin(angle)
             };
-        }
+        });
+        let svgNodes = '', svgEdges = '';
+        // Edges
+        relPairs.forEach(([from, to]) => {
+            let start = nodePos[from], end = nodePos[to];
+            let dx = end.x - start.x, dy = end.y - start.y;
+            let len = Math.sqrt(dx*dx + dy*dy);
+            let normX = dx / len, normY = dy / len;
+            let arrowX = end.x - normX*14, arrowY = end.y - normY*14;
+            // Edge line
+            svgEdges += `<line x1="${start.x}" y1="${start.y}" x2="${arrowX}" y2="${arrowY}" stroke="#4facfe" stroke-width="2" marker-end="url(#arrowhead)"/>`;
+        });
+        // Nodes
+        elements.forEach(el => {
+            let pos = nodePos[el];
+            svgNodes += `<circle cx="${pos.x}" cy="${pos.y}" r="16" fill="#0c223e"/><text x="${pos.x}" y="${pos.y+6}" text-anchor="middle" fill="#fff" font-size="15">${el}</text>`;
+        });
+        // SVG block
+        html += `<div style="margin-top:18px;">
+            <strong>Digraph Visualization:</strong><br>
+            <svg width="260" height="260" style="background:#172749;border-radius:14px">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="7" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#4facfe" />
+                    </marker>
+                </defs>
+                ${svgEdges}
+                ${svgNodes}
+            </svg>
+        </div>`;
 
-        renderMatrix();
-    }
-
-    function renderMatrix() {
-        const matrixList = document.getElementById('matrixList');
-        const noMatrixMsg = document.getElementById('noMatrixMsg');
-        if (currentCategory === 'input') {
-            matrixList.innerHTML = '';
-            if (noMatrixMsg) noMatrixMsg.style.display = 'block';
-        } else {
-            matrixList.innerHTML = '<p>Closure features coming soon!</p>';
-        }
-    }
-
+        matrixList.innerHTML = html;
+        if (noMatrixMsg) noMatrixMsg.style.display = 'none';
+    };
+}
+   
     // Quiz remains unchanged, but adjust heading in HTML ("5 Question")
     const quizQuestions = [
         { q: 'Which is a way to represent a relation?', opts: ['Set of pairs', 'Digraph', 'Matrix', 'All of the above'], a: 3 },
