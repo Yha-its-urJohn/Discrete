@@ -17,17 +17,8 @@ try {
         });
     });
 
-    // Comprehensive topics about Representation and Closure of Relations
+    // -- Topics array: NO Definition, NO Practice Problems topic --
     const repTopics = [
-        {
-            id: "def",
-            label: "Definition of Relations",
-            content: `
-<h2>Definition of Relations</h2>
-<p>A <b>relation</b> R from set A to B is a set of ordered pairs (a, b) where a ∈ A and b ∈ B. If A = B, it's a relation "on" A.</p>
-<pre>Example: If A = {1,2,3}, R = {(1,2), (2,3), (1,3)}</pre>
-`
-        },
         {
             id: "rep",
             label: "Ways to Represent Relations",
@@ -123,20 +114,6 @@ Repeat for all k in {1..n}:
     <li>Equivalence relations in partitioning</li>
     <li>State machines, automata</li>
 </ul>
-`
-        },
-        {
-            id: "practice",
-            label: "Practice Problems & Examples",
-            content: `
-<h2>Practice Problems & Examples</h2>
-<p>Given A = {1,2,3}, R = {(1,2),(2,3)}:</p>
-<ul>
-    <li>Find the matrix representation of R</li>
-    <li>Is R reflexive, symmetric, transitive?</li>
-    <li>Find the reflexive/symmetric/transitive closure</li>
-</ul>
-<p>Try: R = {(a,b),(b,c),(c,a)} on {a,b,c}</p>
 `
         }
     ];
@@ -263,7 +240,7 @@ Repeat for all k in {1..n}:
         }
     }
 
-    // Quiz remains unchanged
+    // Quiz remains unchanged, but adjust heading in HTML ("5 Question")
     const quizQuestions = [
         { q: 'Which is a way to represent a relation?', opts: ['Set of pairs', 'Digraph', 'Matrix', 'All of the above'], a: 3 },
         { q: 'The reflexive closure of R on {1,2} adds which pair?', opts: ['(1,2)', '(2,1)', '(1,1) and (2,2)', 'None'], a: 2 },
