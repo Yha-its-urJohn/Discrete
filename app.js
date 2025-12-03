@@ -1,78 +1,295 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Representation & Closure of Relations</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="animated-bg"><canvas id="bg-canvas"></canvas></div>
-    <header class="site-header">
-        <button id="hamburger" class="hamburger" aria-label="Menu">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </button>
-    </header>
+try {
+    const menuBtn = document.getElementById('hamburger');
+    const mainMenu = document.getElementById('mainMenu');
+    if (menuBtn && mainMenu) {
+        menuBtn.addEventListener('click', () => {
+            mainMenu.classList.toggle('hidden');
+            mainMenu.setAttribute('aria-hidden', mainMenu.classList.contains('hidden') ? 'true' : 'false');
+        });
+    }
 
-    <nav id="mainMenu" class="side-menu hidden" aria-hidden="true">
-        <ul>
-            <li><a href="#" data-page="home">Home</a></li>
-            <li><a href="#" data-page="topics">Topics</a></li>
-            <li><a href="#" data-page="tools">Matrix Tool</a></li>
-            <li><a href="#" data-page="quiz">5 Question</a></li>
-        </ul>
-    </nav>
+    document.querySelectorAll('#mainMenu a').forEach(a => {
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = a.dataset.page;
+            showPage(page);
+            if (mainMenu) mainMenu.classList.add('hidden');
+        });
+    });
 
-    <main id="app">
-        <section id="home" class="page">
-            <div class="hero-center">
-                <h1>Representation & Closure of Relations</h1>
-                <p>Master mathematical relations with interactive tools and quests.</p>
-            </div>
-        </section>
+    // TOPIC LIST: DEFINITION first!
+    const repTopics = [
+        {
+            id: "def",
+            label: "Definition of Relations",
+            content: `
+<h2>Definition of Relations</h2>
+<p>
+A relation <strong>R</strong> from a set <strong>A</strong> to a set <strong>B</strong> is a subset of the Cartesian product <strong>A × B</strong>.<br>
+If <strong>A = B</strong>, the relation is called a relation <strong>on A</strong>.
+</p>
+<h3>Example</h3>
+<p>
+Let A = {1, 2, 3}.<br>
+Define a relation R = {(1,2), (2,3)}.<br>
+This means:
+<ul>
+  <li>1 is related to 2</li>
+  <li>2 is related to 3</li>
+</ul>
+</p>
+`
+        },
+        {
+            id: "rep",
+            label: "Ways to Represent Relations",
+            content: `
+<h2>Ways to Represent Relations</h2>
+<ul>
+    <li>Set of Ordered Pairs: <code>{(1,2), (2,3), (3,1)}</code></li>
+    <li>Table/List</li>
+    <li>Directed Graph (Digraph) <br><img src="assets/images/rel_digraph.png" style="max-width:200px"></li>
+    <li>Zero-One Matrix <br><img src="assets/images/rel_matrix.png" style="max-width:200px"></li>
+    <li>Arrow Diagrams</li>
+</ul>
+`
+        },
+        {
+            id: "types",
+            label: "Types and Properties of Relations",
+            content: `
+<h2>Types and Properties of Relations</h2>
+<ul>
+    <li><b>Reflexive:</b> (a,a) for all a ∈ A</li>
+    <li><b>Irreflexive:</b> No (a,a) for any a</li>
+    <li><b>Symmetric:</b> If (a,b) ∈ R, then (b,a) ∈ R</li>
+    <li><b>Antisymmetric:</b> If (a,b), (b,a) ∈ R, then a = b</li>
+    <li><b>Transitive:</b> If (a,b), (b,c) ∈ R, then (a,c) ∈ R</li>
+    <li><b>Equivalence Relation:</b> Reflexive, Symmetric, and Transitive</li>
+    <li><b>Partial Order:</b> Reflexive, Antisymmetric, and Transitive</li>
+</ul>
+`
+        },
+        {
+            id: "matrix",
+            label: "Zero-One Matrix of Relations",
+            content: `
+<h2>Zero-One Matrix Representation</h2>
+<p>The matrix M of relation R on set A = {a<sub>1</sub>,...,a<sub>n</sub>} has M[i][j] = 1 if (a<sub>i</sub>, a<sub>j</sub>) ∈ R, else 0.</p>
+<pre>
+   1 2 3
+  -------
+1| 1 0 1
+2| 0 1 0
+3| 1 1 1
+</pre>
+`
+        },
+        {
+            id: "digraph",
+            label: "Digraphs & Arrow Diagrams",
+            content: `
+<h2>Digraphs & Arrow Diagrams</h2>
+<p>Relations can be visualized as directed graphs (digraphs), with elements as nodes and arrows for each pair (a,b) ∈ R.</p>
+<img src="assets/images/rel_digraph.png" style="max-width:250px">
+`
+        },
+        {
+            id: "closure",
+            label: "Closure of Relations",
+            content: `
+<h2>Closures of Relations</h2>
+<ul>
+    <li><b>Reflexive Closure:</b> Add (a,a) for all a ∈ A</li>
+    <li><b>Symmetric Closure:</b> Add (b,a) for all (a,b) ∈ R</li>
+    <li><b>Transitive Closure:</b> Add (a,c) whenever (a,b),(b,c) ∈ R</li>
+</ul>
+<pre>
+If R = {(1,2),(2,3)}, transitive closure R* = {(1,2),(2,3),(1,3)}
+</pre>
+`
+        },
+        {
+            id: "algorithms",
+            label: "Algorithms for Closures (Warshall’s)",
+            content: `
+<h2>Algorithms for Closures</h2>
+<p><b>Warshall’s Algorithm</b> quickly finds the transitive closure of a relation using its matrix.</p>
+<pre>
+Repeat for all k in {1..n}:
+  For all i, j:
+    Set M[i][j] = M[i][j] OR (M[i][k] AND M[k][j])
+</pre>
+`
+        },
+        {
+            id: "applications",
+            label: "Applications of Relations/Closures",
+            content: `
+<h2>Applications</h2>
+<ul>
+    <li>Database relationships</li>
+    <li>Social networks (friendship, links)</li>
+    <li>Accessibility, network connectivity</li>
+    <li>Partial orders in task planning</li>
+    <li>Equivalence relations in partitioning</li>
+    <li>State machines, automata</li>
+</ul>
+`
+        }
+    ];
 
-        <section id="topics" class="page hidden">
-            <h2>Choose Your Quest</h2>
-            <div class="topics-list" id="topicsList"></div>
-        </section>
+    // Render the topic buttons and show their content inline, directly below the button
+    function renderTopicButtons() {
+        const topicsList = document.getElementById('topicsList');
+        topicsList.innerHTML = '';
+        repTopics.forEach(topic => {
+            // wrapper for button and inline content div
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '8px';
 
-        <section id="tools" class="page hidden">
-            <h2>Matrix Tool — Build Relation Matrices</h2>
-            <div class="explorer-window">
-                <div class="explorer-header">
-                    <span>Relation Matrix Tool</span>
-                    <button id="newMatrixBtn">New Matrix</button>
-                </div>
-                <div class="explorer-body">
-                    <div class="sidebar">
-                        <div class="sidebar-item active" data-category="input">Input</div>
-                        <div class="sidebar-item" data-category="closure">Closure</div>
-                    </div>
-                    <div class="main-content">
-                        <div class="toolbar">
-                            <input id="matrixInput" placeholder="Enter pairs, e.g. (1,2),(2,3)" />
-                            <button id="matrixBtn">Show Matrix</button>
-                        </div>
-                        <div id="matrixList" class="file-list"></div>
-                        <div id="noMatrixMsg">Enter relation pairs on the left, then hit Show Matrix!</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+            const btn = document.createElement('button');
+            btn.className = 'topic-btn';
+            btn.dataset.topic = topic.id;
+            btn.innerText = topic.label;
 
-        <section id="quiz" class="page hidden">
-            <h2>5 Question — Test Your Knowledge</h2>
-            <div id="quizArea"></div>
-        </section>
-    </main>
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'topic-content-inline';
+            contentDiv.style.display = 'none';
 
-    <footer class="site-footer">
-        <small>Prepared for: Navsjang • Representation & Closure of Relations educational demo</small>
-    </footer>
+            btn.onclick = function() {
+                document.querySelectorAll('.topic-content-inline').forEach(div => {
+                    div.style.display = 'none';
+                    div.innerHTML = '';
+                });
+                contentDiv.innerHTML = topic.content;
+                contentDiv.style.display = 'block';
+                contentDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            };
 
-    <script src="app.js"></script>
-    <script src="bg.js"></script>
-</body>
-</html>
+            wrapper.appendChild(btn);
+            wrapper.appendChild(contentDiv);
+            topicsList.appendChild(wrapper);
+        });
+    }
+
+    // Show page function (adjusted so topics uses renderTopicButtons inline)
+    let currentCategory = 'input';
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+        const el = document.getElementById(page);
+        if (el) {
+            el.classList.remove('hidden');
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+        if (page === 'topics') renderTopicButtons();
+        if (page === 'tools') initMatrixTool();
+        if (page === 'quiz') loadQuiz();
+    }
+
+    // -- Matrix tool logic remains unchanged --
+    function initMatrixTool() {
+        const matrixList = document.getElementById('matrixList');
+        const matrixBtn = document.getElementById('matrixBtn');
+        const matrixInput = document.getElementById('matrixInput');
+        const newMatrixBtn = document.getElementById('newMatrixBtn');
+        const noMatrixMsg = document.getElementById('noMatrixMsg');
+
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                currentCategory = item.dataset.category;
+                renderMatrix();
+            });
+        });
+
+        if (newMatrixBtn) {
+            newMatrixBtn.onclick = () => {
+                matrixInput.value = '';
+                matrixList.innerHTML = '';
+                if (noMatrixMsg) noMatrixMsg.style.display = 'block';
+            };
+        }
+
+        if (matrixBtn && matrixInput) {
+            matrixBtn.onclick = () => {
+                const input = matrixInput.value;
+                const pairs = input.match(/\(([^)]+)\)/g);
+                if (!pairs || !pairs.length) {
+                    matrixList.innerHTML = '<p>Enter at least one pair like (1,2),(2,3)</p>';
+                    if (noMatrixMsg) noMatrixMsg.style.display = 'none';
+                    return;
+                }
+                let elements = new Set();
+                let relPairs = [];
+                pairs.forEach(pair => {
+                    let nums = pair.replace(/[()]/g, '').split(',');
+                    if (nums.length === 2) {
+                        elements.add(nums[0].trim());
+                        elements.add(nums[1].trim());
+                        relPairs.push(nums.map(x => x.trim()));
+                    }
+                });
+                elements = Array.from(elements).sort();
+                let html = '<table><tr><th></th>' + elements.map(e => `<th>${e}</th>`).join('') + '</tr>';
+                elements.forEach(row => {
+                    html += `<tr><td>${row}</td>`;
+                    elements.forEach(col => {
+                        let found = relPairs.some(([r, c]) => r === row && c === col);
+                        html += `<td>${found ? '1' : '0'}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</table>';
+                matrixList.innerHTML = html;
+                if (noMatrixMsg) noMatrixMsg.style.display = 'none';
+            };
+        }
+
+        renderMatrix();
+    }
+
+    function renderMatrix() {
+        const matrixList = document.getElementById('matrixList');
+        const noMatrixMsg = document.getElementById('noMatrixMsg');
+        if (currentCategory === 'input') {
+            matrixList.innerHTML = '';
+            if (noMatrixMsg) noMatrixMsg.style.display = 'block';
+        } else {
+            matrixList.innerHTML = '<p>Closure features coming soon!</p>';
+        }
+    }
+
+    // Quiz remains unchanged, but adjust heading in HTML ("5 Question")
+    const quizQuestions = [
+        { q: 'Which is a way to represent a relation?', opts: ['Set of pairs', 'Digraph', 'Matrix', 'All of the above'], a: 3 },
+        { q: 'The reflexive closure of R on {1,2} adds which pair?', opts: ['(1,2)', '(2,1)', '(1,1) and (2,2)', 'None'], a: 2 },
+        { q: 'If (1,2) is in R, which pair is added in symmetric closure?', opts: ['(2,1)', '(1,1)', '(2,2)', 'None'], a: 0 },
+        { q: 'Which closure adds (a,c) when (a,b) and (b,c) are in R?', opts: ['Reflexive', 'Symmetric', 'Transitive', 'None'], a: 2 },
+        { q: 'Matrix entry M[2][3] = 1 means?', opts: ['Relation from 2 to 3', 'Relation from 3 to 2', 'No relation', 'Unknown'], a: 0 }
+    ];
+
+    function loadQuiz() {
+        const area = document.getElementById('quizArea');
+        if (!area) return;
+        area.innerHTML = '';
+        quizQuestions.forEach((qq, idx) => {
+            const div = document.createElement('div'); div.className = 'quiz-card';
+            div.innerHTML = `<p><strong>Q${idx + 1}:</strong> ${qq.q}</p>`;
+            qq.opts.forEach((opt, i) => {
+                const btn = document.createElement('button'); btn.innerText = opt;
+                btn.onclick = () => {
+                    if (i === qq.a) alert('Correct!');
+                    else alert('Incorrect!');
+                };
+                div.appendChild(btn);
+            });
+            area.appendChild(div);
+        });
+    }
+
+    showPage('home');
+} catch (error) {
+    console.error('Error:', error);
+}
